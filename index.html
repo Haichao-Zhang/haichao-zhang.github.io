@@ -15,12 +15,10 @@
       <nav aria-label="Primary">
         <a href="#posts">Posts</a>
         <a href="#about">About</a>
-        <a href="#publish">Publish</a>
         <a href="https://sites.google.com/site/hczhang1/home">More</a>
       </nav>
     </div>
-    <p class="intro">Research notes and results in machine learning, robotics and AI.</p>
-    <p class="contact">Senior Research Scientist at Horizon Robotics, Cupertino. <a href="mailto:hczhang1@gmail.com">hczhang1@gmail.com</a></p>
+    <p class="intro">Research notes and results in robotics, learning and AI.</p>
   </header>
 
   <main>
@@ -37,18 +35,8 @@
 
     <section id="about" aria-labelledby="about-title">
       <h2 class="section-title" id="about-title">About</h2>
-      <p>I work on robot learning and embodied AI.</p>
-      <ul class="small-list">
-        <li>Best Student Paper Award, ICCV 2011</li>
-        <li>Best Student Paper Honorable Mention, FUSION 2011</li>
-        <li>Doctoral Consortium, CVPR 2013</li>
-        <li>Outstanding Doctoral Dissertation Award, China Computer Federation, 2016</li>
-      </ul>
-    </section>
-
-    <section class="publish" id="publish" aria-labelledby="publish-title">
-      <h2 id="publish-title">Add a Post</h2>
-      <p>Create a new Markdown file in <code>posts/</code>, then add one entry to <code>posts/manifest.js</code>. Commit both files and push them to GitHub.</p>
+      <p>I work on robotics and embodied AI.</p>
+      <p><a href="https://sites.google.com/site/hczhang1/home">More</a></p>
     </section>
   </main>
 
@@ -226,7 +214,7 @@ async function loadPost(post) {
 
 function route() {
   const slug = window.location.hash.replace("#", "");
-  if (!slug || slug === "posts" || slug === "about" || slug === "publish") {
+  if (!slug || slug === "posts" || slug === "about") {
     reader.innerHTML = '<p class="empty">Select a post to read.</p>';
     return;
   }
