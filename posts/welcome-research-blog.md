@@ -3,7 +3,7 @@ title: Starting This Research Blog
 slug: welcome-research-blog
 date: 2026-04-22
 summary: A lightweight place for research results, implementation notes, and project updates.
-tags: [Site, Research]
+# tags: [Site, Research]
 ---
 
 ### Welcome
