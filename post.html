@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Haichao Zhang's research blog post.">
+<title>Post | Haichao Zhang</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="topline">
+      <h1><a class="site-title" href="./">Haichao Zhang</a></h1>
+      <nav aria-label="Primary">
+        <a href="./#posts">Posts</a>
+        <a href="./#about">About</a>
+        <a href="https://sites.google.com/site/hczhang1/home">More</a>
+      </nav>
+    </div>
+    <p class="intro">Research notes and results in robotics and AI.</p>
+  </header>
+
+  <main>
+    <article class="post" id="reader" aria-live="polite">
+      <p class="empty">Loading post...</p>
+    </article>
+  </main>
+
+  <footer>
+    &copy; <span id="year"></span> Haichao Zhang.
+  </footer>
+</div>
+
+<script src="posts/manifest.js"></script>
+<script>
+const reader = document.getElementById("reader");
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatDate(value) {
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(new Date(`${value}T00:00:00`));
+}
+
+function sortedPosts() {
+  return [...(window.BLOG_POSTS || [])].sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function requestedSlug() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("post") || window.location.hash.replace("#", "");
+}
+
+function postBySlug(slug) {
+  return sortedPosts().find((post) => post.slug === slug);
+}
+
+function inlineMarkdown(text) {
+  return escapeHtml(text)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
+function markdownToHtml(markdown) {
+  const lines = markdown.replace(/\r\n/g, "\n").trim().split("\n");
+  const html = [];
+  let listOpen = false;
+  let codeOpen = false;
+  let codeLines = [];
+
+  function closeList() {
+    if (listOpen) {
+      html.push("</ul>");
+      listOpen = false;
+    }
+  }
+
+  function closeCode() {
+    if (codeOpen) {
+      html.push(`<pre><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+      codeLines = [];
+      codeOpen = false;
+    }
+  }
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("```")) {
+      if (codeOpen) {
+        closeCode();
+      } else {
+        closeList();
+        codeOpen = true;
+      }
+      return;
+    }
+
+    if (codeOpen) {
+      codeLines.push(line);
+      return;
+    }
+
+    if (!trimmed) {
+      closeList();
+      return;
+    }
+
+    if (trimmed.startsWith("### ")) {
+      closeList();
+      html.push(`<h3>${inlineMarkdown(trimmed.slice(4))}</h3>`);
+      return;
+    }
+
+    if (trimmed.startsWith("## ")) {
+      closeList();
+      html.push(`<h3>${inlineMarkdown(trimmed.slice(3))}</h3>`);
+      return;
+    }
+
+    if (trimmed.startsWith("- ")) {
+      if (!listOpen) {
+        html.push("<ul>");
+        listOpen = true;
+      }
+      html.push(`<li>${inlineMarkdown(trimmed.slice(2))}</li>`);
+      return;
+    }
+
+    closeList();
+    html.push(`<p>${inlineMarkdown(trimmed)}</p>`);
+  });
+
+  closeCode();
+  closeList();
+  return html.join("");
+}
+
+async function loadPost() {
+  if (!Array.isArray(window.BLOG_POSTS)) {
+    reader.innerHTML = '<p class="empty">Could not load posts/manifest.js. Make sure it is committed and pushed with the posts directory.</p>';
+    return;
+  }
+
+  const slug = requestedSlug();
+  const post = postBySlug(slug);
+  if (!post) {
+    reader.innerHTML = '<p class="empty">Post not found. <a href="./#posts">Back to posts</a></p>';
+    return;
+  }
+
+  try {
+    const response = await fetch(post.file);
+    if (!response.ok) {
+      throw new Error(`Unable to load ${post.file}`);
+    }
+    const markdown = await response.text();
+    document.title = `${post.title} | Haichao Zhang`;
+    reader.innerHTML = `
+      <p class="post-date">${formatDate(post.date)}</p>
+      <h2>${escapeHtml(post.title)}</h2>
+      <p class="post-summary">${escapeHtml(post.summary)}</p>
+      <div class="post-tags">
+        ${(post.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
+      </div>
+      <div class="post-body">${markdownToHtml(markdown)}</div>
+      <p class="post-nav"><a href="./#posts">Back to posts</a></p>
+    `;
+  } catch (error) {
+    reader.innerHTML = `<p class="empty">${escapeHtml(error.message)}. Make sure this Markdown file is committed and pushed.</p>`;
+  }
+}
+
+document.getElementById("year").textContent = new Date().getFullYear();
+loadPost();
+</script>
+</body>
+</html>
