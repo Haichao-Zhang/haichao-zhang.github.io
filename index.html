@@ -42,37 +42,11 @@
 </div>
 
 <script src="posts/manifest.js"></script>
+<script src="assets/blog.js"></script>
 <script>
 const postList = document.getElementById("postList");
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function formatDate(value) {
-  return new Intl.DateTimeFormat("en", {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  }).format(new Date(`${value}T00:00:00`));
-}
-
-function sortedPosts() {
-  return [...(window.BLOG_POSTS || [])].sort((a, b) => b.date.localeCompare(a.date));
-}
-
-function renderPostList() {
-  if (!Array.isArray(window.BLOG_POSTS)) {
-    postList.innerHTML = '<li class="empty">Could not load posts/manifest.js. Make sure it is committed and pushed with the posts directory.</li>';
-    return;
-  }
-
-  const posts = sortedPosts();
+function renderPostList(posts) {
   if (!posts.length) {
     postList.innerHTML = '<li class="empty">No posts yet.</li>';
     return;
@@ -80,12 +54,12 @@ function renderPostList() {
 
   postList.innerHTML = posts.map((post) => `
     <li class="post-item">
-      <time class="post-date" datetime="${escapeHtml(post.date)}">${formatDate(post.date)}</time>
+      <time class="post-date" datetime="${Blog.escapeHtml(post.date)}">${Blog.formatDate(post.date)}</time>
       <div>
-        <div class="post-title"><a href="post.html?post=${encodeURIComponent(post.slug)}">${escapeHtml(post.title)}</a></div>
-        <p class="post-summary">${escapeHtml(post.summary)}</p>
+        <div class="post-title"><a href="post.html?post=${encodeURIComponent(post.slug)}">${Blog.escapeHtml(post.title)}</a></div>
+        <p class="post-summary">${Blog.escapeHtml(post.summary)}</p>
         <div class="post-tags">
-          ${(post.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
+          ${(post.tags || []).map((tag) => `<span class="tag">${Blog.escapeHtml(tag)}</span>`).join("")}
         </div>
       </div>
     </li>
@@ -93,7 +67,11 @@ function renderPostList() {
 }
 
 document.getElementById("year").textContent = new Date().getFullYear();
-renderPostList();
+Blog.loadPosts()
+  .then(renderPostList)
+  .catch((error) => {
+    postList.innerHTML = `<li class="empty">${Blog.escapeHtml(error.message)}. Make sure the manifest and Markdown files are committed and pushed.</li>`;
+  });
 </script>
 </body>
 </html>
