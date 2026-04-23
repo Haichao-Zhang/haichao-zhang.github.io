@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Haichao Zhang's research blog and homepage.">
+<title>{% if page.title %}{{ page.title }} | {% endif %}Haichao Zhang</title>
+<link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="topline">
+      <h1><a class="site-title" href="{{ '/' | relative_url }}">Haichao Zhang</a></h1>
+      <nav aria-label="Primary">
+        <a href="{{ '/#posts' | relative_url }}">Posts</a>
+        <a href="{{ '/#about' | relative_url }}">About</a>
+        <a href="{{ '/#publish' | relative_url }}">Publish</a>
+        <a href="https://sites.google.com/site/hczhang1/home">More</a>
+      </nav>
+    </div>
+    <p class="intro">Research notes and results in machine learning, robotics and AI.</p>
+    <p class="contact">Senior Research Scientist at Horizon Robotics, Cupertino. <a href="mailto:hczhang1@gmail.com">hczhang1@gmail.com</a></p>
+  </header>
+
+  <main>
+    {{ content }}
+  </main>
+
+  <footer>
+    &copy; {{ site.time | date: "%Y" }} Haichao Zhang.
+  </footer>
+</div>
+</body>
+</html>

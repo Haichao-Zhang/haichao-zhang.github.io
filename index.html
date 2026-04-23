@@ -1,49 +1,242 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Haichao Zhang's research blog and homepage.">
 <title>Haichao Zhang</title>
-
-<style>
-  body {
-      margin: 1em auto;
-    max-width: 48em;
-    font: .8em/1.5 Helvetica;
-  }
-  h1, h2, h3 {
-    line-height: 1.5;
-  }
-  div.title {
-    font-weight: bold;
-  }
-  li {
-    margin: 1em auto;
-    line-height: 1.5;
-  }
-</style>
+<link rel="stylesheet" href="assets/style.css">
 </head>
-
 <body>
+<div class="page">
+  <header>
+    <div class="topline">
+      <h1><a class="site-title" href="./">Haichao Zhang</a></h1>
+      <nav aria-label="Primary">
+        <a href="#posts">Posts</a>
+        <a href="#about">About</a>
+        <a href="#publish">Publish</a>
+        <a href="https://sites.google.com/site/hczhang1/home">More</a>
+      </nav>
+    </div>
+    <p class="intro">Research notes and results in machine learning, robotics and AI.</p>
+    <p class="contact">Senior Research Scientist at Horizon Robotics, Cupertino. <a href="mailto:hczhang1@gmail.com">hczhang1@gmail.com</a></p>
+  </header>
 
-<h1>Haichao Zhang</h1>
+  <main>
+    <section id="posts" aria-labelledby="posts-title">
+      <h2 class="section-title" id="posts-title">Posts</h2>
+      <ul class="post-list" id="postList">
+        <li class="empty">Loading posts...</li>
+      </ul>
+    </section>
 
-<p>----------------------------------------------------------</p>
+    <article class="post" id="reader" aria-live="polite">
+      <p class="empty">Select a post to read.</p>
+    </article>
 
-<p>I'm a Senior Research Scientist at Horizon Robotics, Cupertino.</p>
+    <section id="about" aria-labelledby="about-title">
+      <h2 class="section-title" id="about-title">About</h2>
+      <p>I work on robot learning and embodied AI.</p>
+      <ul class="small-list">
+        <li>Best Student Paper Award, ICCV 2011</li>
+        <li>Best Student Paper Honorable Mention, FUSION 2011</li>
+        <li>Doctoral Consortium, CVPR 2013</li>
+        <li>Outstanding Doctoral Dissertation Award, China Computer Federation, 2016</li>
+      </ul>
+    </section>
 
-<p>I'm working on CV/ML/NLP/AI with focus on sparse/deep/robust/reinforcement learning, low/high-level vision and language learning.</p>
+    <section class="publish" id="publish" aria-labelledby="publish-title">
+      <h2 id="publish-title">Add a Post</h2>
+      <p>Create a new Markdown file in <code>posts/</code>, then add one entry to <code>posts/manifest.js</code>. Commit both files and push them to GitHub.</p>
+    </section>
+  </main>
 
-<p>My e-mail address is <a href="mailto:hczhang1@gmail.com">hczhang1@gmail.com</a>.</p>
+  <footer>
+    &copy; <span id="year"></span> Haichao Zhang.
+  </footer>
+</div>
 
-<h2>Awards and Honors</h2>
-<p><span style="font-weight:bold"> Best Student Paper Award</span>  13th International Conference on Computer Vision (ICCV) 2011</p>
-<p><span style="font-weight:bold"> Best Student Paper Honorable Mention</span>  14th International Conference on Information Fusion (FUSION)  2011</p>
-<p><span style="font-weight:bold"> Doctoral Consortium</span>   IEEE Conference on Computer Vision and Pattern Recognition (CVPR) 2013</p>
-<p><span style="font-weight:bold"> Outstanding Doctoral Dissertation Award</span>  China Computer Federation (CCF) 2016</p>
+<script src="posts/manifest.js"></script>
+<script>
+const postList = document.getElementById("postList");
+const reader = document.getElementById("reader");
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-<h2>More Info.</h2>
-<a href="https://sites.google.com/site/hczhang1/home">[more]</a>
+function formatDate(value) {
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(new Date(`${value}T00:00:00`));
+}
 
+function sortedPosts() {
+  return [...(window.BLOG_POSTS || [])].sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function postBySlug(slug) {
+  const posts = sortedPosts();
+  return posts.find((post) => post.slug === slug) || posts[0];
+}
+
+function renderPostList() {
+  if (!Array.isArray(window.BLOG_POSTS)) {
+    postList.innerHTML = '<li class="empty">Could not load posts/manifest.js. Make sure it is committed and pushed with the posts directory.</li>';
+    return;
+  }
+
+  const posts = sortedPosts();
+  if (!posts.length) {
+    postList.innerHTML = '<li class="empty">No posts yet.</li>';
+    return;
+  }
+
+  postList.innerHTML = posts.map((post) => `
+    <li class="post-item">
+      <time class="post-date" datetime="${escapeHtml(post.date)}">${formatDate(post.date)}</time>
+      <div>
+        <div class="post-title"><a href="#${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a></div>
+        <p class="post-summary">${escapeHtml(post.summary)}</p>
+        <div class="post-tags">
+          ${(post.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
+        </div>
+      </div>
+    </li>
+  `).join("");
+}
+
+function inlineMarkdown(text) {
+  return escapeHtml(text)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
+function markdownToHtml(markdown) {
+  const lines = markdown.replace(/\r\n/g, "\n").trim().split("\n");
+  const html = [];
+  let listOpen = false;
+  let codeOpen = false;
+  let codeLines = [];
+
+  function closeList() {
+    if (listOpen) {
+      html.push("</ul>");
+      listOpen = false;
+    }
+  }
+
+  function closeCode() {
+    if (codeOpen) {
+      html.push(`<pre><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+      codeLines = [];
+      codeOpen = false;
+    }
+  }
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("```")) {
+      if (codeOpen) {
+        closeCode();
+      } else {
+        closeList();
+        codeOpen = true;
+      }
+      return;
+    }
+
+    if (codeOpen) {
+      codeLines.push(line);
+      return;
+    }
+
+    if (!trimmed) {
+      closeList();
+      return;
+    }
+
+    if (trimmed.startsWith("### ")) {
+      closeList();
+      html.push(`<h3>${inlineMarkdown(trimmed.slice(4))}</h3>`);
+      return;
+    }
+
+    if (trimmed.startsWith("## ")) {
+      closeList();
+      html.push(`<h3>${inlineMarkdown(trimmed.slice(3))}</h3>`);
+      return;
+    }
+
+    if (trimmed.startsWith("- ")) {
+      if (!listOpen) {
+        html.push("<ul>");
+        listOpen = true;
+      }
+      html.push(`<li>${inlineMarkdown(trimmed.slice(2))}</li>`);
+      return;
+    }
+
+    closeList();
+    html.push(`<p>${inlineMarkdown(trimmed)}</p>`);
+  });
+
+  closeCode();
+  closeList();
+  return html.join("");
+}
+
+async function loadPost(post) {
+  if (!post) {
+    reader.innerHTML = '<p class="empty">Select a post to read.</p>';
+    return;
+  }
+
+  reader.innerHTML = '<p class="empty">Loading post...</p>';
+  try {
+    const response = await fetch(post.file);
+    if (!response.ok) {
+      throw new Error(`Unable to load ${post.file}`);
+    }
+    const markdown = await response.text();
+    reader.innerHTML = `
+      <p class="post-date">${formatDate(post.date)}</p>
+      <h2>${escapeHtml(post.title)}</h2>
+      <p class="post-summary">${escapeHtml(post.summary)}</p>
+      <div class="post-tags">
+        ${(post.tags || []).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}
+      </div>
+      <div class="post-body">${markdownToHtml(markdown)}</div>
+      <p class="post-nav"><a href="#posts">Back to posts</a></p>
+    `;
+  } catch (error) {
+    reader.innerHTML = `<p class="empty">${escapeHtml(error.message)}. Make sure this Markdown file is committed and pushed.</p>`;
+  }
+}
+
+function route() {
+  const slug = window.location.hash.replace("#", "");
+  if (!slug || slug === "posts" || slug === "about" || slug === "publish") {
+    reader.innerHTML = '<p class="empty">Select a post to read.</p>';
+    return;
+  }
+  loadPost(postBySlug(slug));
+}
+
+document.getElementById("year").textContent = new Date().getFullYear();
+renderPostList();
+window.addEventListener("hashchange", route);
+route();
+</script>
 </body>
 </html>
