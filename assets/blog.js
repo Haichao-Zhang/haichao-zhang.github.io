@@ -68,9 +68,6 @@
     if (Array.isArray(window.BLOG_POST_FILES)) {
       return window.BLOG_POST_FILES;
     }
-    if (Array.isArray(window.BLOG_POSTS)) {
-      return window.BLOG_POSTS.map((post) => post.file).filter(Boolean);
-    }
     return null;
   }
 
