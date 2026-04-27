@@ -6,6 +6,18 @@
 <meta name="description" content="Haichao Zhang's research blog post.">
 <title>Post | Haichao Zhang</title>
 <link rel="stylesheet" href="assets/style.css">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["$", "$"], ["\\(", "\\)"]],
+    displayMath: [["$$", "$$"], ["\\[", "\\]"]]
+  },
+  svg: {
+    fontCache: "global"
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
 <div class="page">
@@ -61,6 +73,10 @@ async function loadPost() {
     <div class="post-body">${Blog.markdownToHtml(post.body)}</div>
     <p class="post-nav"><a href="./#posts">Back to posts</a></p>
   `;
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    await window.MathJax.typesetPromise([reader]);
+  }
 }
 
 document.getElementById("year").textContent = new Date().getFullYear();

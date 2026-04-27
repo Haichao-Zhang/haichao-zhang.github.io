@@ -1,7 +1,7 @@
 ---
 title: Can Robots Tell If They’re Making Progress?
 slug: progress-estimation
-date: 2026-04-22
+date: 2026-04-26
 summary: Progress Estimation of Task Execution
 ---
 
@@ -142,16 +142,16 @@ Here we show some example trajectories from the Bridge dataset.
 
 <div class="video-grid">
   <video controls muted playsinline preload="metadata">
-    <source src="{{ '/assets/posts/progress_estimation/episode_0000_video.mp4' | relative_url }}" type="video/mp4">
+    <source src="/assets/posts/progress_estimation/episode_0000_video.mp4" type="video/mp4">
   </video>
   <video controls muted playsinline preload="metadata">
-    <source src="{{ '/assets/posts/progress_estimation/episode_0001_video.mp4' | relative_url }}" type="video/mp4">
+    <source src="/assets/posts/progress_estimation/episode_0001_video.mp4" type="video/mp4">
   </video>
   <video controls muted playsinline preload="metadata">
-    <source src="{{ '/assets/posts/progress_estimation/episode_0002_video.mp4' | relative_url }}" type="video/mp4">
+    <source src="/assets/posts/progress_estimation/episode_0002_video.mp4" type="video/mp4">
   </video>
   <video controls muted playsinline preload="metadata">
-    <source src="{{ '/assets/posts/progress_estimation/episode_0003_video.mp4' | relative_url }}" type="video/mp4">
+    <source src="/assets/posts/progress_estimation/episode_0003_video.mp4" type="video/mp4">
   </video>
 </div>
 
@@ -179,4 +179,3 @@ The answer does not need to be perfect.
 Even a **noisy, learned notion of progress** can serve as a powerful signal—  
 bridging the gap between perception and action in long-horizon robot learning. 
 We will explore this further in future posts.
-

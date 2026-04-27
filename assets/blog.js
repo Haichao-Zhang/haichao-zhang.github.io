@@ -95,17 +95,37 @@
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   }
 
+  function htmlBlockTag(trimmed) {
+    const match = trimmed.match(/^<(div|figure|video|iframe|table)\b/i);
+    return match ? match[1].toLowerCase() : null;
+  }
+
   function markdownToHtml(markdown) {
     const lines = markdown.replace(/\r\n/g, "\n").trim().split("\n");
     const html = [];
     let listOpen = false;
+    let quoteOpen = false;
+    let quoteLines = [];
     let codeOpen = false;
     let codeLines = [];
+    let htmlOpen = false;
+    let htmlTag = "";
+    let htmlLines = [];
+    let mathOpen = false;
+    let mathLines = [];
 
     function closeList() {
       if (listOpen) {
         html.push("</ul>");
         listOpen = false;
+      }
+    }
+
+    function closeQuote() {
+      if (quoteOpen) {
+        html.push(`<blockquote>${quoteLines.map((line) => `<p>${inlineMarkdown(line)}</p>`).join("")}</blockquote>`);
+        quoteLines = [];
+        quoteOpen = false;
       }
     }
 
@@ -117,14 +137,48 @@
       }
     }
 
+    function closeHtml() {
+      if (htmlOpen) {
+        html.push(htmlLines.join("\n"));
+        htmlTag = "";
+        htmlLines = [];
+        htmlOpen = false;
+      }
+    }
+
+    function closeMath() {
+      if (mathOpen) {
+        html.push(`<div class="math-block">${escapeHtml(mathLines.join("\n"))}</div>`);
+        mathLines = [];
+        mathOpen = false;
+      }
+    }
+
     lines.forEach((line) => {
       const trimmed = line.trim();
+
+      if (htmlOpen) {
+        htmlLines.push(line);
+        if (trimmed.toLowerCase() === `</${htmlTag}>`) {
+          closeHtml();
+        }
+        return;
+      }
+
+      if (mathOpen) {
+        mathLines.push(line);
+        if (trimmed === "$$" || trimmed === "\\]") {
+          closeMath();
+        }
+        return;
+      }
 
       if (trimmed.startsWith("```")) {
         if (codeOpen) {
           closeCode();
         } else {
           closeList();
+          closeQuote();
           codeOpen = true;
         }
         return;
@@ -137,22 +191,76 @@
 
       if (!trimmed) {
         closeList();
+        closeQuote();
+        return;
+      }
+
+      if (trimmed === "---" || trimmed === "***") {
+        closeList();
+        closeQuote();
+        html.push("<hr>");
+        return;
+      }
+
+      if (trimmed === "$$" || trimmed === "\\[") {
+        closeList();
+        closeQuote();
+        mathOpen = true;
+        mathLines.push(line);
+        return;
+      }
+
+      if (trimmed.startsWith("> ")) {
+        closeList();
+        quoteOpen = true;
+        quoteLines.push(trimmed.slice(2));
+        return;
+      }
+
+      const blockTag = htmlBlockTag(trimmed);
+      if (blockTag || /^<source\b/i.test(trimmed) || /^<img\b/i.test(trimmed)) {
+        closeList();
+        closeQuote();
+        if (/\/>$/.test(trimmed) || /^<source\b/i.test(trimmed) || /^<img\b/i.test(trimmed)) {
+          html.push(line);
+        } else {
+          htmlOpen = true;
+          htmlTag = blockTag;
+          htmlLines.push(line);
+          if (trimmed.toLowerCase() === `</${htmlTag}>`) {
+            closeHtml();
+          }
+        }
+        return;
+      }
+
+      if (trimmed.startsWith("<!--")) {
+        return;
+      }
+
+      if (trimmed.startsWith("#### ")) {
+        closeList();
+        closeQuote();
+        html.push(`<h3>${inlineMarkdown(trimmed.slice(5))}</h3>`);
         return;
       }
 
       if (trimmed.startsWith("### ")) {
         closeList();
+        closeQuote();
         html.push(`<h3>${inlineMarkdown(trimmed.slice(4))}</h3>`);
         return;
       }
 
       if (trimmed.startsWith("## ")) {
         closeList();
+        closeQuote();
         html.push(`<h3>${inlineMarkdown(trimmed.slice(3))}</h3>`);
         return;
       }
 
       if (trimmed.startsWith("- ")) {
+        closeQuote();
         if (!listOpen) {
           html.push("<ul>");
           listOpen = true;
@@ -162,10 +270,14 @@
       }
 
       closeList();
+      closeQuote();
       html.push(`<p>${inlineMarkdown(trimmed)}</p>`);
     });
 
     closeCode();
+    closeHtml();
+    closeMath();
+    closeQuote();
     closeList();
     return html.join("");
   }

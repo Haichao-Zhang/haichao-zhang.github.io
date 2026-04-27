@@ -187,10 +187,27 @@ section {
   margin: 13px 0;
 }
 
+.post-body blockquote {
+  border-left: 3px solid var(--line);
+  color: #2f3940;
+  margin: 18px 0;
+  padding: 2px 0 2px 16px;
+}
+
+.post-body blockquote p {
+  margin: 8px 0;
+}
+
 .post-body ul,
 .post-body ol {
   margin: 12px 0;
   padding-left: 24px;
+}
+
+.post-body hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 28px 0;
 }
 
 .post-body code,
@@ -213,6 +230,29 @@ section {
 .post-body pre code {
   background: transparent;
   padding: 0;
+}
+
+.math-block,
+mjx-container[display="true"] {
+  margin: 18px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.video-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin: 18px 0;
+}
+
+.video-grid video,
+.video-grid iframe,
+.video-grid img {
+  background: #000;
+  border-radius: 8px;
+  display: block;
+  width: 100%;
 }
 
 .post-nav {
