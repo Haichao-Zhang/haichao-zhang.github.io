@@ -157,6 +157,40 @@ Here we show some example trajectories from the Bridge dataset.
 
 ---
 
+## Automated Data Quality Assurance
+
+The progress estimator can also be used as a lightweight tool for automated data quality assurance.
+
+In the Bridge dataset and other dataset, for example, it helps surface trajectories with clear annotation or other collection issues, such as:
+
+- incorrect or misleading language instructions (left)
+- incorrect initial scene setup (for "stacking the green cube on top of the yellow cube") (right)
+
+<div class="video-grid">
+  <video controls muted playsinline preload="metadata">
+    <source src="/assets/posts/progress_estimation/episode_0046_video_wrong_instruction.mp4" type="video/mp4">
+  </video>
+  <video controls muted playsinline preload="metadata">
+    <source src="/assets/posts/progress_estimation/episode_0014_video_incorrect_init_scene_setup.mp4" type="video/mp4">
+  </video>
+</div>
+
+
+The next video shows the same trajectory before (left) and after (right) correcting the instruction:
+
+<div class="video-grid">
+  <video controls muted playsinline preload="metadata">
+    <source src="/assets/posts/progress_estimation/episode_0046_video_wrong_instruction.mp4" type="video/mp4">
+  </video>
+  <video controls muted playsinline preload="metadata">
+    <source src="/assets/posts/progress_estimation/episode_0046_video_correct_instruction.mp4" type="video/mp4">
+  </video>
+</div>
+
+---
+
+  
+
 ## Looking Forward
 
 Progress estimation opens up several promising directions:
