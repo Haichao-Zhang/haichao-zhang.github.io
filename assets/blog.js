@@ -85,7 +85,7 @@
       return parseFrontMatter(await response.text(), file);
     }));
 
-    return posts.sort((a, b) => b.date.localeCompare(a.date));
+    return posts.reverse();
   }
 
   function inlineMarkdown(text) {
