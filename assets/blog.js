@@ -241,7 +241,7 @@
       if (trimmed.startsWith("#### ")) {
         closeList();
         closeQuote();
-        html.push(`<h3>${inlineMarkdown(trimmed.slice(5))}</h3>`);
+        html.push(`<h4>${inlineMarkdown(trimmed.slice(5))}</h4>`);
         return;
       }
 
@@ -255,7 +255,7 @@
       if (trimmed.startsWith("## ")) {
         closeList();
         closeQuote();
-        html.push(`<h3>${inlineMarkdown(trimmed.slice(3))}</h3>`);
+        html.push(`<h2>${inlineMarkdown(trimmed.slice(3))}</h2>`);
         return;
       }
 
